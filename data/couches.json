@@ -401,7 +401,7 @@
  },
  {
   "id": "villages",
-  "groupe": "Relevé de terrain OKAPI",
+  "groupe": "Localités le long du corridor",
   "titre": "Villages relevés",
   "geom": "point",
   "style": {
