@@ -1,0 +1,523 @@
+[
+ {
+  "id": "emprise",
+  "groupe": "Corridor",
+  "titre": "Emprise 500 m",
+  "geom": "polygone",
+  "style": {
+   "trait": "#f9a825",
+   "remplissage": "#ffeb3b",
+   "opacite": 0.18,
+   "epaisseur": 1
+  },
+  "champs": [],
+  "info": "Bande de 500 m de part et d'autre de l'axe, 564,6 km².",
+  "fichier": "data/emprise.geojson",
+  "n": 1
+ },
+ {
+  "id": "phases",
+  "groupe": "Corridor",
+  "titre": "Phases du programme",
+  "geom": "ligne",
+  "style": {
+   "epaisseur": 4,
+   "categories": {
+    "1": "#1b7837",
+    "2": "#762a83",
+    "3": "#e08214",
+    "4": "#d6191c"
+   },
+   "champ_categorie": "phase"
+  },
+  "champs": [
+   [
+    "phase_nom",
+    "Phase"
+   ],
+   [
+    "longueur_km",
+    "Longueur (km)"
+   ]
+  ],
+  "info": "Découpage en quatre phases d'aménagement ; le pont d'Akula (phase 5) est un ouvrage ponctuel.",
+  "fichier": "data/phases.geojson",
+  "n": 11
+ },
+ {
+  "id": "axe",
+  "groupe": "Corridor",
+  "titre": "Axe RN6 / RN23",
+  "geom": "ligne",
+  "style": {
+   "couleur": "#212121",
+   "epaisseur": 2
+  },
+  "champs": [
+   [
+    "id",
+    "Tronçon"
+   ],
+   [
+    "longueur_km",
+    "Longueur (km)"
+   ]
+  ],
+  "info": "565,5 km, dix tronçons.",
+  "fichier": "data/axe.geojson",
+  "n": 10
+ },
+ {
+  "id": "sante",
+  "groupe": "Équipements de proximité (moins de 500 m)",
+  "titre": "Santé",
+  "geom": "point",
+  "style": {
+   "forme": "circle",
+   "couleur": "#e31a1c",
+   "taille": 5
+  },
+  "champs": [
+   [
+    "nom",
+    "Nom"
+   ],
+   [
+    "niveau_sante",
+    "Niveau"
+   ],
+   [
+    "localite_proche",
+    "Localité"
+   ],
+   [
+    "zone_sante",
+    "Zone de santé"
+   ],
+   [
+    "aire_sante",
+    "Aire de santé"
+   ],
+   [
+    "phase",
+    "Phase"
+   ],
+   [
+    "source_courte",
+    "Source"
+   ]
+  ],
+  "info": "270 formations sanitaires. Le contour noir signale un comptage au village, sans position individuelle.",
+  "fichier": "data/sante.geojson",
+  "n": 270
+ },
+ {
+  "id": "education",
+  "groupe": "Équipements de proximité (moins de 500 m)",
+  "titre": "Éducation",
+  "geom": "point",
+  "style": {
+   "forme": "square",
+   "couleur": "#1f78b4",
+   "taille": 5
+  },
+  "champs": [
+   [
+    "nom",
+    "Nom"
+   ],
+   [
+    "type_ecole",
+    "Cycle"
+   ],
+   [
+    "nb",
+    "Nombre"
+   ],
+   [
+    "localite_proche",
+    "Localité"
+   ],
+   [
+    "phase",
+    "Phase"
+   ],
+   [
+    "source_courte",
+    "Source"
+   ]
+  ],
+  "info": "88 enregistrements pour 104 écoles : 96 viennent du relevé d'OKAPI, comptées au village.",
+  "fichier": "data/education.geojson",
+  "n": 88
+ },
+ {
+  "id": "marches",
+  "groupe": "Équipements de proximité (moins de 500 m)",
+  "titre": "Marchés et stockage",
+  "geom": "point",
+  "style": {
+   "forme": "diamond",
+   "couleur": "#ff7f00",
+   "taille": 6
+  },
+  "champs": [
+   [
+    "sous_theme",
+    "Type"
+   ],
+   [
+    "nom",
+    "Nom"
+   ],
+   [
+    "localite_proche",
+    "Localité"
+   ],
+   [
+    "phase",
+    "Phase"
+   ]
+  ],
+  "info": "9 marchés et 2 silos. Le marché hebdomadaire de village n'apparaît dans aucune source ouverte.",
+  "fichier": "data/marches.geojson",
+  "n": 11
+ },
+ {
+  "id": "transport",
+  "groupe": "Équipements de proximité (moins de 500 m)",
+  "titre": "Ports, bacs et aérodromes",
+  "geom": "point",
+  "style": {
+   "forme": "star",
+   "couleur": "#00695c",
+   "taille": 7
+  },
+  "champs": [
+   [
+    "sous_theme",
+    "Type"
+   ],
+   [
+    "nom",
+    "Nom"
+   ],
+   [
+    "localite_proche",
+    "Localité"
+   ],
+   [
+    "phase",
+    "Phase"
+   ],
+   [
+    "source_courte",
+    "Source"
+   ]
+  ],
+  "info": "Infrastructures de corridor, distinctes de la desserte de proximité.",
+  "fichier": "data/transport.geojson",
+  "n": 7
+ },
+ {
+  "id": "eau",
+  "groupe": "Priorisation — eau potable",
+  "titre": "Priorité par village",
+  "geom": "point",
+  "style": {
+   "forme": "circle",
+   "champ_gradue": "score_demande",
+   "paliers": [
+    [
+     0,
+     "#2c7bb6"
+    ],
+    [
+     40,
+     "#abd9e9"
+    ],
+    [
+     60,
+     "#fdae61"
+    ],
+    [
+     75,
+     "#d7191c"
+    ]
+   ],
+   "champ_taille": "forages_indicatifs",
+   "taille_min": 4,
+   "taille_max": 12
+  },
+  "champs": [
+   [
+    "village",
+    "Village"
+   ],
+   [
+    "rang",
+    "Rang"
+   ],
+   [
+    "score_demande",
+    "Score de demande"
+   ],
+   [
+    "pop_ghs_2030",
+    "Population 2030 (1 km)"
+   ],
+   [
+    "forages_indicatifs",
+    "Forages indicatifs"
+   ],
+   [
+    "dist_riviere_km",
+    "Rivière la plus proche (km)"
+   ],
+   [
+    "prod_aquifere",
+    "Classe de productivité"
+   ],
+   [
+    "phase",
+    "Phase"
+   ]
+  ],
+  "info": "Score de demande : 45 % population, 25 % écoles et santé, 15 % croissance, 15 % éloignement de la rivière. Taille du cercle = nombre de forages indicatifs.",
+  "fichier": "data/eau.geojson",
+  "n": 137
+ },
+ {
+  "id": "rehab_sante",
+  "groupe": "Priorisation — réhabilitation",
+  "titre": "Formations sanitaires",
+  "geom": "point",
+  "style": {
+   "forme": "circle",
+   "champ_gradue": "score_service",
+   "paliers": [
+    [
+     0,
+     "#2c7bb6"
+    ],
+    [
+     40,
+     "#abd9e9"
+    ],
+    [
+     60,
+     "#fdae61"
+    ],
+    [
+     75,
+     "#d7191c"
+    ]
+   ],
+   "champ_taille": "charge_hab_structure",
+   "taille_min": 4,
+   "taille_max": 13
+  },
+  "champs": [
+   [
+    "rang_500m",
+    "Rang"
+   ],
+   [
+    "nom",
+    "Structure"
+   ],
+   [
+    "niveau",
+    "Niveau"
+   ],
+   [
+    "localite_proche",
+    "Localité"
+   ],
+   [
+    "score_service",
+    "Valeur de service"
+   ],
+   [
+    "pop_desservie_2030",
+    "Population desservie"
+   ],
+   [
+    "charge_hab_structure",
+    "Habitants par structure"
+   ],
+   [
+    "dist_structure_km",
+    "Structure la plus proche (km)"
+   ],
+   [
+    "rayon_desserte_m",
+    "Rayon de desserte (m)"
+   ],
+   [
+    "phase",
+    "Phase"
+   ]
+  ],
+  "info": "Valeur de service d'une réhabilitation, et non état du bâtiment, qui n'est documenté nulle part. Taille = habitants par structure.",
+  "fichier": "data/rehab_sante.geojson",
+  "n": 209
+ },
+ {
+  "id": "rehab_ecoles",
+  "groupe": "Priorisation — réhabilitation",
+  "titre": "Villages scolaires",
+  "geom": "point",
+  "style": {
+   "forme": "square",
+   "champ_gradue": "score_service",
+   "paliers": [
+    [
+     0,
+     "#2c7bb6"
+    ],
+    [
+     40,
+     "#abd9e9"
+    ],
+    [
+     60,
+     "#fdae61"
+    ],
+    [
+     75,
+     "#d7191c"
+    ]
+   ],
+   "champ_taille": "charge_hab_ecole",
+   "taille_min": 4,
+   "taille_max": 13,
+   "contour_si": "declaration_partielle"
+  },
+  "champs": [
+   [
+    "rang",
+    "Rang"
+   ],
+   [
+    "village",
+    "Village"
+   ],
+   [
+    "score_service",
+    "Valeur de service"
+   ],
+   [
+    "nb_ecoles",
+    "Écoles déclarées"
+   ],
+   [
+    "pop_2km_2030",
+    "Population 2030 (2 km)"
+   ],
+   [
+    "charge_hab_ecole",
+    "Habitants par école"
+   ],
+   [
+    "dist_village_ecole_km",
+    "Village scolaire suivant (km)"
+   ],
+   [
+    "declaration_partielle",
+    "Comptage partiel"
+   ],
+   [
+    "phase",
+    "Phase"
+   ]
+  ],
+  "info": "Classement par village, faute d'écoles géolocalisées. Contour noir : comptage d'OKAPI manifestement partiel, à lire comme une donnée manquante et non comme une priorité.",
+  "fichier": "data/rehab_ecoles.geojson",
+  "n": 80
+ },
+ {
+  "id": "villages",
+  "groupe": "Relevé de terrain OKAPI",
+  "titre": "Villages relevés",
+  "geom": "point",
+  "style": {
+   "forme": "circle",
+   "couleur": "#90a4ae",
+   "taille": 4
+  },
+  "champs": [
+   [
+    "village",
+    "Village"
+   ],
+   [
+    "section",
+    "Section"
+   ],
+   [
+    "pk_declare_km",
+    "PK déclaré"
+   ],
+   [
+    "pop_estimee",
+    "Population estimée"
+   ],
+   [
+    "nb_ecoles",
+    "Écoles"
+   ],
+   [
+    "nb_centres_sante",
+    "Centres de santé"
+   ],
+   [
+    "riviere",
+    "Rivière"
+   ],
+   [
+    "motif",
+    "Réserve"
+   ],
+   [
+    "phase",
+    "Phase"
+   ]
+  ],
+  "info": "148 villages relevés au GPS, septembre 2026. La population est estimative et ne sert à aucun calcul.",
+  "fichier": "data/villages.geojson",
+  "n": 148
+ },
+ {
+  "id": "rivieres",
+  "groupe": "Relevé de terrain OKAPI",
+  "titre": "Franchissements de rivières",
+  "geom": "point",
+  "style": {
+   "forme": "triangle",
+   "couleur": "#0288d1",
+   "taille": 5
+  },
+  "champs": [
+   [
+    "village",
+    "Village"
+   ],
+   [
+    "riviere",
+    "Rivière"
+   ],
+   [
+    "nb_ponts",
+    "Ponts"
+   ],
+   [
+    "phase",
+    "Phase"
+   ]
+  ],
+  "info": "Franchissements relevés par OKAPI.",
+  "fichier": "data/rivieres.geojson",
+  "n": 11
+ }
+]
