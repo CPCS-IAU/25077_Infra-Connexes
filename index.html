@@ -58,7 +58,9 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:var(
 .couche .outils button{border:0;background:none;color:#78909c;font-size:11px;
   cursor:pointer;padding:0;text-decoration:underline}
 .couche .outils button:hover{color:var(--rouge)}
-.couche input[type=range]{width:66px;height:12px}
+.couche input[type=range]{width:60px;height:12px}
+.couche .etiq-curseur{font-size:10.5px;color:#90a4ae}
+.g-tete .g-check{margin:0}
 .legende{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px 10px}
 .legende span{display:flex;align-items:center;gap:4px;font-size:10.5px;color:#607d8b}
 .info{margin-top:4px;font-size:10.5px;line-height:1.35;color:#78909c;display:none}
@@ -70,6 +72,9 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:var(
 #fonds{padding:9px 12px;border-top:1px solid var(--bord)}
 #fonds label{font-size:11px;margin-right:10px;cursor:pointer}
 .sortable-ghost{opacity:.35}
+.etiq-loc{font:11px Arial;color:#1a237e;white-space:nowrap;font-weight:bold;
+  text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff,0 0 2px #fff;
+  pointer-events:none}
 .leaflet-popup-content{font:12px Arial;margin:10px 12px;max-height:320px;overflow:auto}
 .leaflet-popup-content h4{margin:0 0 6px;font-size:13px;color:var(--navy)}
 .leaflet-popup-content table{border-collapse:collapse}
@@ -100,6 +105,9 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:var(
       <label><input type="radio" name="fond" value="osm" checked> OpenStreetMap</label>
       <label><input type="radio" name="fond" value="sat"> Satellite</label>
       <label><input type="radio" name="fond" value="clair"> Fond clair</label>
+      <label><input type="radio" name="fond" value="blanc"> Aucun (blanc)</label>
+      <label style="display:block;margin-top:7px"><input type="checkbox" id="etiq" checked>
+        Étiquettes des localités</label>
     </div>
     <div id="pied">
       <b>Glisser</b> une couche ou un groupe pour changer l'ordre de dessin.<br>
@@ -121,8 +129,10 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:var(
    z-index a chaque reorganisation.
    ===================================================================== */
 
-const carte = L.map('carte', {preferCanvas:true, zoomControl:false})
-                .setView([3.1, 20.0], 7);
+// Pas de preferCanvas : un canvas par pane intercepte les clics des panes
+// situes en dessous, ce qui rendait les villages inaccessibles. En SVG chaque
+// objet est un element du DOM, dans son propre pane, et reste cliquable.
+const carte = L.map('carte', {zoomControl:false}).setView([3.1, 20.0], 7);
 L.control.zoom({position:'topright'}).addTo(carte);
 L.control.scale({imperial:false, position:'bottomright'}).addTo(carte);
 
@@ -131,14 +141,19 @@ const FONDS = {
         {maxZoom:19, attribution:'© OpenStreetMap'}),
   sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         {maxZoom:19, attribution:'Esri, Maxar, Earthstar Geographics'}),
-  clair: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        {maxZoom:19, attribution:'© OpenStreetMap, © CARTO'})
+  // CARTO exige desormais une cle d'API : on prend le fond gris d'Esri, libre
+  clair: L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        {maxZoom:19, maxNativeZoom:16, attribution:'Esri, HERE, Garmin, © OpenStreetMap'}),
+  blanc: null   // aucun fond : la carte reste blanche, pour lire un raster
 };
 let fondActif = FONDS.osm.addTo(carte);
 document.querySelectorAll('input[name=fond]').forEach(r =>
   r.addEventListener('change', e => {
-    carte.removeLayer(fondActif);
-    fondActif = FONDS[e.target.value].addTo(carte);
+    if (fondActif) carte.removeLayer(fondActif);
+    fondActif = FONDS[e.target.value];
+    if (fondActif) fondActif.addTo(carte);
+    document.getElementById('carte').style.background =
+      e.target.value === 'blanc' ? '#ffffff' : '#e9eef2';
   }));
 
 /* ------------------------------------------------------------ symboles */
@@ -215,8 +230,13 @@ Promise.all([
     }
     if (c.visible) c.couche.addTo(carte);
   }
+  carte.createPane('etiquettes');
+  carte.getPane('etiquettes').style.zIndex = 650;
+  carte.getPane('etiquettes').style.pointerEvents = 'none';
   construirePanneau();
   appliquerOrdre();
+  majEtiquettes();
+  document.getElementById('etiq').addEventListener('change', majEtiquettes);
   const g = L.featureGroup(COUCHES.filter(c => c.id === 'axe').map(c => c.couche));
   if (g.getLayers().length) carte.fitBounds(g.getBounds().pad(0.05));
 });
@@ -228,8 +248,11 @@ function construire(c){
     const vals = c.geojson.features.map(f => +f.properties[st.champ_taille] || 0);
     mini = Math.min(...vals); maxi = Math.max(...vals);
   }
+  // un seul rendu SVG par couche, partage par tous ses objets
+  const rend = L.svg({pane:c.pane});
   return L.geoJSON(c.geojson, {
     pane: c.pane,
+    renderer: rend,
     style: f => {
       if (c.geom === 'polygone')
         return {color:st.trait, weight:st.epaisseur, fillColor:st.remplissage,
@@ -249,8 +272,8 @@ function construire(c){
         ? tailleGraduee(st, +p[st.champ_taille] || 0, mini, maxi) : st.taille;
       const contour = st.contour_si ? !!p[st.contour_si] : false;
       if ((st.forme || 'circle') === 'circle' && !contour)
-        return L.circleMarker(latlng, {pane:c.pane, radius:t, fillColor:coul,
-                 color:'#37474F', weight:0.7, fillOpacity:0.9});
+        return L.circleMarker(latlng, {pane:c.pane, renderer:rend, radius:t,
+                 fillColor:coul, color:'#37474F', weight:0.7, fillOpacity:0.9});
       return L.marker(latlng, {pane:c.pane, icon:icone(st.forme || 'circle', coul, t, contour)});
     },
     onEachFeature: (f, l) => l.bindPopup(infobulle(c, f.properties), {maxWidth:340})
@@ -277,6 +300,7 @@ function construirePanneau(){
   hote.innerHTML = groupes.map(g => `
     <div class="groupe" data-groupe="${g}">
       <div class="g-tete"><span class="poignee">⣿</span>
+        <input type="checkbox" class="g-check" title="afficher ou masquer tout le groupe">
         <span class="nom">${g}</span><span class="chevron">▾</span></div>
       <div class="g-corps">${
         COUCHES.filter(c => c.groupe === g).map(c => ligne(c)).join('')}</div>
@@ -284,8 +308,19 @@ function construirePanneau(){
 
   hote.querySelectorAll('.g-tete').forEach(t => {
     t.addEventListener('click', e => {
-      if (e.target.classList.contains('poignee')) return;
+      if (e.target.classList.contains('poignee') ||
+          e.target.classList.contains('g-check')) return;
       t.parentElement.classList.toggle('plie');
+    });
+  });
+  // case du groupe : tout afficher ou tout masquer d'un coup
+  hote.querySelectorAll('.g-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const grp = cb.closest('.groupe');
+      grp.querySelectorAll('.couche input[type=checkbox]').forEach(x => {
+        if (x.checked !== cb.checked){ x.checked = cb.checked;
+          x.dispatchEvent(new Event('change')); }
+      });
     });
   });
   hote.querySelectorAll('.couche').forEach(el => {
@@ -300,6 +335,8 @@ function construirePanneau(){
       c.visible = e.target.checked;
       el.classList.toggle('masquee', !c.visible);
       if (c.visible) c.couche.addTo(carte); else carte.removeLayer(c.couche);
+      if (c.id === 'villages') majEtiquettes();
+      majCaseGroupe(el.closest('.groupe'));
     });
     el.querySelector('.titre').addEventListener('click', () =>
       el.classList.toggle('deplie'));
@@ -316,6 +353,8 @@ function construirePanneau(){
   });
 
   // groupes reordonnables, et couches reordonnables y compris d'un groupe a l'autre
+  hote.querySelectorAll('.groupe').forEach(majCaseGroupe);
+
   Sortable.create(hote, {handle:'.g-tete .poignee', animation:140,
     ghostClass:'sortable-ghost', onEnd:appliquerOrdre});
   hote.querySelectorAll('.g-corps').forEach(corps =>
@@ -325,16 +364,28 @@ function construirePanneau(){
 
 function cssPane(p){ return 'leaflet-' + p + '-pane'; }
 
+/* la case du groupe reflete l'etat de ses couches : toutes, aucune, ou partiel */
+function majCaseGroupe(grp){
+  if (!grp) return;
+  const cases = [...grp.querySelectorAll('.couche input[type=checkbox]')];
+  const n = cases.filter(x => x.checked).length;
+  const cb = grp.querySelector('.g-check');
+  cb.checked = n === cases.length && n > 0;
+  cb.indeterminate = n > 0 && n < cases.length;
+}
+
 function ligne(c){
   return `<div class="couche" data-id="${c.id}">
     <span class="poignee">⣿</span>
     <input type="checkbox" checked>
     <div class="corps">
-      <div class="titre">${c.titre} <span class="compte">(${c.n})</span></div>
+      <div class="titre">${c.titre}${c.n ? ` <span class="compte">(${c.n})</span>` : ''}</div>
       <div class="legende">${legende(c)}</div>
       <div class="outils">
-        <button class="zoom">zoom</button>
-        <input type="range" min="10" max="100" value="100" title="opacité">
+        <button class="zoom" title="cadrer la carte sur la couche">cadrer</button>
+        <span class="etiq-curseur">transparence</span>
+        <input type="range" min="10" max="100" value="100"
+               title="opacité de la couche">
       </div>
       <div class="info">${c.info || ''}</div>
     </div></div>`;
@@ -382,6 +433,36 @@ function appliquerOrdre(){
     carte.getPane(c.pane).style.zIndex = 400 + (n - i) * 10;
   });
 }
+
+/* --------------------------------------------------- etiquettes des localites
+   Les 148 villages du releve OKAPI portent le nom des localites du corridor.
+   Les afficher tous au niveau regional serait illisible : les etiquettes
+   n'apparaissent qu'a partir du zoom 9, et se retirent en dessous. */
+const ZOOM_ETIQ = 9;
+let etiquettes = null;
+
+function majEtiquettes(){
+  const c = COUCHES.find(x => x.id === 'villages');
+  const voulu = document.getElementById('etiq').checked
+                && c && c.visible && carte.getZoom() >= ZOOM_ETIQ;
+  if (voulu && !etiquettes){
+    etiquettes = L.layerGroup([], {pane:'etiquettes'});
+    c.geojson.features.forEach(f => {
+      const nom = f.properties.village;
+      if (!nom) return;
+      const [lon, lat] = f.geometry.coordinates;
+      etiquettes.addLayer(L.marker([lat, lon], {pane:'etiquettes',
+        interactive:false,
+        icon:L.divIcon({className:'etiq-loc', html:nom, iconSize:null,
+                        iconAnchor:[-7, 7]})}));
+    });
+    etiquettes.addTo(carte);
+  } else if (!voulu && etiquettes){
+    carte.removeLayer(etiquettes);
+    etiquettes = null;
+  }
+}
+carte.on('zoomend', majEtiquettes);
 
 /* ------------------------------------------------------------ clic raster
    Aucune donnee n'est publiee en plus : on relit la couleur du pixel dans

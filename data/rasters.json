@@ -1,7 +1,7 @@
 [
  {
   "id": "r_population",
-  "groupe": "Contexte (rasters)",
+  "groupe": "Couches de contexte",
   "titre": "Population 2030 (100 m)",
   "geom": "raster",
   "fichier": "data/raster_population.png",
@@ -43,7 +43,7 @@
  },
  {
   "id": "r_productivite",
-  "groupe": "Contexte (rasters)",
+  "groupe": "Couches de contexte",
   "titre": "Productivité de l'aquifère",
   "geom": "raster",
   "fichier": "data/raster_productivite.png",
@@ -89,7 +89,7 @@
  },
  {
   "id": "r_stockage",
-  "groupe": "Contexte (rasters)",
+  "groupe": "Couches de contexte",
   "titre": "Stockage souterrain",
   "geom": "raster",
   "fichier": "data/raster_stockage.png",
@@ -135,7 +135,7 @@
  },
  {
   "id": "r_sol",
-  "groupe": "Contexte (rasters)",
+  "groupe": "Couches de contexte",
   "titre": "Classe de sol (WRB)",
   "geom": "raster",
   "fichier": "data/raster_sol.png",
