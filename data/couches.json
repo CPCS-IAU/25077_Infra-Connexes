@@ -73,7 +73,7 @@
   ],
   "info": "Valeur de service d'une réhabilitation, et non état du bâtiment, qui n'est documenté nulle part. Taille = habitants par structure.",
   "fichier": "data/rehab_sante.geojson",
-  "n": 209,
+  "n": 212,
   "visible": true
  },
  {
@@ -285,7 +285,7 @@
   ],
   "info": "270 formations sanitaires. Le contour noir signale un comptage au village, sans position individuelle.",
   "fichier": "data/sante.geojson",
-  "n": 270,
+  "n": 273,
   "visible": true
  },
  {
@@ -326,7 +326,7 @@
   ],
   "info": "88 enregistrements pour 104 écoles : 96 viennent du relevé d'OKAPI, comptées au village.",
   "fichier": "data/education.geojson",
-  "n": 88,
+  "n": 89,
   "visible": true
  },
  {
@@ -527,7 +527,7 @@
   ],
   "info": "Découpage en quatre phases d'aménagement ; le pont d'Akula (phase 5) est un ouvrage ponctuel.",
   "fichier": "data/phases.geojson",
-  "n": 11,
+  "n": 12,
   "visible": true
  },
  {
@@ -551,7 +551,7 @@
   ],
   "info": "565,5 km, dix tronçons.",
   "fichier": "data/axe.geojson",
-  "n": 10,
+  "n": 11,
   "visible": true
  },
  {
