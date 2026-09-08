@@ -1,0 +1,198 @@
+[
+ {
+  "id": "r_population",
+  "groupe": "Contexte (rasters)",
+  "titre": "Population 2030 (100 m)",
+  "geom": "raster",
+  "fichier": "data/raster_population.png",
+  "bornes": [
+   [
+    1.8886510792036453,
+    18.341828266789705
+   ],
+   [
+    4.615625135098052,
+    21.774702706555708
+   ]
+  ],
+  "opacite": 0.75,
+  "visible": false,
+  "legende": [
+   [
+    "moins de 5 hab./ha",
+    "#ffffcc"
+   ],
+   [
+    "5 à 25",
+    "#fed976"
+   ],
+   [
+    "25 à 100",
+    "#fd8d3c"
+   ],
+   [
+    "100 à 500",
+    "#e31a1c"
+   ],
+   [
+    "plus de 500",
+    "#800026"
+   ]
+  ],
+  "info": "GHS-POP R2023A (Copernicus / JRC), projection 2030, maille de 100 m. Les valeurs sont des habitants par cellule, soit par hectare."
+ },
+ {
+  "id": "r_productivite",
+  "groupe": "Contexte (rasters)",
+  "titre": "Productivité de l'aquifère",
+  "geom": "raster",
+  "fichier": "data/raster_productivite.png",
+  "bornes": [
+   [
+    1.8886510792036453,
+    18.341828266789705
+   ],
+   [
+    4.615625135098052,
+    21.774702706555708
+   ]
+  ],
+  "opacite": 0.7,
+  "visible": false,
+  "legende": [
+   [
+    "> 20 l/s — très élevée",
+    "#08306b"
+   ],
+   [
+    "5 – 20 l/s — élevée",
+    "#2171b5"
+   ],
+   [
+    "1 – 5 l/s — modérée",
+    "#6baed6"
+   ],
+   [
+    "0,5 – 1 l/s — faible à modérée",
+    "#fdae61"
+   ],
+   [
+    "0,1 – 0,5 l/s — faible",
+    "#f46d43"
+   ],
+   [
+    "< 0,1 l/s — très faible",
+    "#a50026"
+   ]
+  ],
+  "info": "Débit de forage attendu, d'après MacDonald et al. (2012), maille de 5 km. Attention : la classe 1 est la meilleure. Le corridor est entièrement en classes 1 à 3."
+ },
+ {
+  "id": "r_stockage",
+  "groupe": "Contexte (rasters)",
+  "titre": "Stockage souterrain",
+  "geom": "raster",
+  "fichier": "data/raster_stockage.png",
+  "bornes": [
+   [
+    1.8886510792036453,
+    18.341828266789705
+   ],
+   [
+    4.615625135098052,
+    21.774702706555708
+   ]
+  ],
+  "opacite": 0.7,
+  "visible": false,
+  "legende": [
+   [
+    "négligeable",
+    "#a50026"
+   ],
+   [
+    "très faible",
+    "#f46d43"
+   ],
+   [
+    "modéré",
+    "#fee090"
+   ],
+   [
+    "assez élevé",
+    "#abd9e9"
+   ],
+   [
+    "élevé",
+    "#4575b4"
+   ],
+   [
+    "très élevé",
+    "#08306b"
+   ]
+  ],
+  "info": "Volume mobilisable, d'après MacDonald et al. (2012). Ce raster se lit dans l'autre sens que la productivité : ici la classe 6 est la meilleure."
+ },
+ {
+  "id": "r_sol",
+  "groupe": "Contexte (rasters)",
+  "titre": "Classe de sol (WRB)",
+  "geom": "raster",
+  "fichier": "data/raster_sol.png",
+  "bornes": [
+   [
+    1.8886510792036453,
+    18.341828266789705
+   ],
+   [
+    4.615625135098052,
+    21.774702706555708
+   ]
+  ],
+  "opacite": 0.7,
+  "visible": false,
+  "legende": [
+   [
+    "Acrisols",
+    "#d95f02"
+   ],
+   [
+    "Arenosols",
+    "#fdd0a2"
+   ],
+   [
+    "Cambisols",
+    "#a6761d"
+   ],
+   [
+    "Ferralsols",
+    "#e6ab02"
+   ],
+   [
+    "Fluvisols",
+    "#1b9e77"
+   ],
+   [
+    "Gleysols",
+    "#7570b3"
+   ],
+   [
+    "Leptosols",
+    "#666666"
+   ],
+   [
+    "Lixisols",
+    "#e7298a"
+   ],
+   [
+    "Luvisols",
+    "#c994c7"
+   ],
+   [
+    "Vertisols",
+    "#525252"
+   ]
+  ],
+  "info": "SoilGrids 2.0 (ISRIC), classe dominante. La table WRB est indexée à partir de zéro : la valeur 10 est Ferralsols, pas Durisols. Le corridor est couvert à 89 % de Ferralsols et d'Acrisols."
+ }
+]

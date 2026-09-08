@@ -183,24 +183,37 @@ function infobulle(c, props){
     return `<tr><td>${lib}</td><td><b>${v}</b></td></tr>`;
   }).join('');
   const titre = props.nom || props.village || props.phase_nom || c.titre;
-  return `<h4>${titre}</h4><table>${t}</table>`;
+  return `<h4>${titre}</h4>` + (t ? `<table>${t}</table>`
+    : `<div style="color:#78909c">${c.info || ''}</div>`);
 }
 
 /* ------------------------------------------------------------ chargement */
 let COUCHES = [], ordre = [];
 const indexRecherche = [];
 
-fetch('data/couches.json').then(r => r.json()).then(async manifeste => {
-  COUCHES = manifeste;
+Promise.all([
+  fetch('data/couches.json').then(r => r.json()),
+  fetch('data/rasters.json').then(r => r.json()).catch(() => [])
+]).then(async ([vecteurs, rasters]) => {
+  // les rasters ferment la marche : ce sont des fonds thematiques
+  COUCHES = vecteurs.concat(rasters);
   for (const c of COUCHES){
     carte.createPane('p_' + c.id);
     c.pane = 'p_' + c.id;
-    c.geojson = await (await fetch(c.fichier)).json();
-    c.couche = construire(c);
-    c.visible = true;
-    c.opacite = 1;
-    c.couche.addTo(carte);
-    indexer(c);
+    if (c.geom === 'raster'){
+      c.couche = L.imageOverlay(c.fichier, c.bornes,
+                   {pane:c.pane, opacity:1, interactive:false});
+      c.visible = c.visible !== false;
+      c.opacite = c.opacite || 0.7;
+      prechargerRaster(c);
+    } else {
+      c.geojson = await (await fetch(c.fichier)).json();
+      c.couche = construire(c);
+      c.visible = c.visible !== false;
+      c.opacite = 1;
+      indexer(c);
+    }
+    if (c.visible) c.couche.addTo(carte);
   }
   construirePanneau();
   appliquerOrdre();
@@ -277,7 +290,13 @@ function construirePanneau(){
   });
   hote.querySelectorAll('.couche').forEach(el => {
     const c = COUCHES.find(x => x.id === el.dataset.id);
-    el.querySelector('input[type=checkbox]').addEventListener('change', e => {
+    const cb = el.querySelector('input[type=checkbox]');
+    cb.checked = c.visible;
+    el.classList.toggle('masquee', !c.visible);
+    const cur = el.querySelector('input[type=range]');
+    cur.value = Math.round(c.opacite * 100);
+    carte.getPane(c.pane).style.opacity = c.opacite;
+    cb.addEventListener('change', e => {
       c.visible = e.target.checked;
       el.classList.toggle('masquee', !c.visible);
       if (c.visible) c.couche.addTo(carte); else carte.removeLayer(c.couche);
@@ -285,7 +304,10 @@ function construirePanneau(){
     el.querySelector('.titre').addEventListener('click', () =>
       el.classList.toggle('deplie'));
     el.querySelector('.zoom').addEventListener('click', () => {
-      try { carte.fitBounds(c.couche.getBounds().pad(0.08)); } catch(_){}
+      try {
+        carte.fitBounds(c.geom === 'raster' ? c.bornes
+                                            : c.couche.getBounds().pad(0.08));
+      } catch(_){}
     });
     el.querySelector('input[type=range]').addEventListener('input', e => {
       c.opacite = e.target.value / 100;
@@ -325,6 +347,10 @@ function pastille(forme, couleur, contour){
        stroke-width="${contour ? 1.6 : .7}">${chemin(forme, t)}</g></svg>`;
 }
 function legende(c){
+  if (c.geom === 'raster')
+    return c.legende.map(([lib, coul]) =>
+      `<span><svg width="14" height="11"><rect width="14" height="11" fill="${coul}"
+        stroke="#b0bec5" stroke-width=".5"/></svg>${lib}</span>`).join('');
   const st = c.style;
   if (c.geom === 'polygone')
     return `<span><svg width="16" height="16"><rect x="2" y="4" width="12" height="8"
@@ -356,6 +382,54 @@ function appliquerOrdre(){
     carte.getPane(c.pane).style.zIndex = 400 + (n - i) * 10;
   });
 }
+
+/* ------------------------------------------------------------ clic raster
+   Aucune donnee n'est publiee en plus : on relit la couleur du pixel dans
+   l'image deja chargee, et la legende donne la classe. L'image etant en Web
+   Mercator, l'interpolation verticale se fait sur la latitude projetee. */
+function mercY(lat){
+  return Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+}
+function prechargerRaster(c){
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+    cv.getContext('2d').drawImage(img, 0, 0);
+    c._cv = cv;
+    c._ctx = cv.getContext('2d', {willReadFrequently:true});
+  };
+  img.src = c.fichier;
+}
+function classeAu(c, latlng){
+  if (!c._ctx) return null;
+  const [[s, o], [n, e]] = c.bornes;
+  if (latlng.lat < s || latlng.lat > n || latlng.lng < o || latlng.lng > e) return null;
+  const fx = (latlng.lng - o) / (e - o);
+  const fy = (mercY(n) - mercY(latlng.lat)) / (mercY(n) - mercY(s));
+  const x = Math.min(c._cv.width - 1, Math.max(0, Math.floor(fx * c._cv.width)));
+  const y = Math.min(c._cv.height - 1, Math.max(0, Math.floor(fy * c._cv.height)));
+  const d = c._ctx.getImageData(x, y, 1, 1).data;
+  if (d[3] < 30) return null;
+  const hex = '#' + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, '0')).join('');
+  const t = c.legende.find(([, coul]) => coul.toLowerCase() === hex);
+  return t ? t[0] : null;
+}
+carte.on('click', e => {
+  const lignes = [];
+  for (const c of COUCHES){
+    if (c.geom !== 'raster' || !c.visible) continue;
+    const cl = classeAu(c, e.latlng);
+    if (cl) lignes.push(`<tr><td>${c.titre}</td><td><b>${cl}</b></td></tr>`);
+  }
+  if (!lignes.length) return;
+  L.popup({maxWidth:340}).setLatLng(e.latlng)
+    .setContent(`<h4>Contexte au point cliqué</h4><table>${lignes.join('')}</table>
+      <div style="margin-top:6px;color:#90a4ae;font-size:11px">
+      ${e.latlng.lat.toFixed(4)}° N, ${e.latlng.lng.toFixed(4)}° E</div>`)
+    .openOn(carte);
+});
 
 /* ------------------------------------------------------------ recherche */
 const champQ = document.getElementById('q'), boiteR = document.getElementById('resultats');

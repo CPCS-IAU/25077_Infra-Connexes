@@ -4,7 +4,7 @@ Visualiseur des couches SIG du mandat **CPCS 25077** (étude d'appui à la
 mobilité et au transport dans la zone du corridor Bangui–Zongo–Akula–Lisala,
 RDC).
 
-Douze couches réparties en cinq groupes thématiques, dont l'ordre de dessin se
+Quinze couches réparties en six groupes thématiques, dont l'ordre de dessin se
 réorganise par glisser-déposer, comme dans un SIG de bureau.
 
 | Groupe | Couches |
@@ -13,7 +13,8 @@ réorganise par glisser-déposer, comme dans un SIG de bureau.
 | Équipements de proximité (moins de 500 m) | santé, éducation, marchés et stockage, ports/bacs/aérodromes |
 | Priorisation — eau potable | priorité par village |
 | Priorisation — réhabilitation | formations sanitaires, villages scolaires |
-| Relevé de terrain OKAPI | villages relevés, franchissements de rivières |
+| Relevé de terrain OKAPI | villages relevés |
+| Contexte (rasters) | population 2030, productivité de l'aquifère, stockage souterrain, classe de sol |
 
 ## Sources
 
@@ -22,12 +23,19 @@ OpenStreetMap et export national HOT OSM · Overture Maps · GHS-POP R2023A
 (Copernicus / JRC) · MacDonald et al. 2012 (UNESCO IHP-WINS) · SoilGrids 2.0 ·
 HydroRIVERS v1.0 · analyse CPCS 2026.
 
+Chaque objet est cliquable : une structure de santé donne son niveau, son aire
+de santé, sa population desservie, sa charge et son rang de réhabilitation ; un
+village donne son relevé OKAPI, son rang de priorité pour l'eau et son rang
+scolaire. Un clic hors objet lit la classe des rasters affichés, sans télécharger
+de donnée supplémentaire : le navigateur relit la couleur du pixel.
+
 ## Mise à jour des données
 
 Depuis le dossier du mandat, régénérer les GeoJSON puis recopier :
 
 ```
 "C:\Program Files\QGIS 3.44.4\apps\Python312\python.exe" 04_scripts\27_export_web.py
+"C:\Program Files\QGIS 3.44.4pps\Python312\python.exe" 04_scripts8_export_rasters_web.py
 ```
 
 Le script écrit dans `Analyse_SIG_Corridor/05_sig_en_ligne/data/`. Copier ce
