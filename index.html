@@ -113,7 +113,11 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:var(
       <b>Glisser</b> une couche ou un groupe pour changer l'ordre de dessin.<br>
       Sources : relevé OKAPI (sept. 2026) · GRID3 COD v9.0 · OpenStreetMap et HOT OSM ·
       Overture Maps · GHS-POP R2023A (Copernicus / JRC) · MacDonald et al. 2012 ·
-      HydroRIVERS · CPCS 2026.
+      HydroRIVERS · CPCS 2026.<br>
+      <b>Coûts de réhabilitation : ordres de grandeur</b>, et non des devis. Coût du
+      neuf documenté en RDC — nomenclature budgétaire de l'État, PDL-145T (CREFDL
+      2025), Urbaplan et CRATerre 2010 — ramené à 40–60 % pour une reprise lourde,
+      puis pondéré par l'échelon. L'état des bâtiments n'est relevé nulle part.
     </div>
   </aside>
   <div id="carte"></div>
@@ -190,11 +194,48 @@ function tailleGraduee(st, v, mini, maxi){
 }
 
 /* ------------------------------------------------------------ infobulle */
+const NOMBRE = new Intl.NumberFormat('fr-FR');
+
+/* Champs a deux valeurs : oui / non ne suffit pas, on dit ce que cela veut
+   dire. Le second libelle est celui de la valeur fausse. */
+const OUI_NON = {
+  declaration_partielle: ['oui — comptage à compléter', 'non'],
+  ecole_partiel:         ['oui — comptage à compléter', 'non'],
+  pdl145t:               ['oui — déjà réhabilité, hors chiffrage', 'non'],
+  rehab_pdl:             ['oui — déjà réhabilité, hors chiffrage', 'non'],
+  dans_assiette:         ['oui', 'non — déjà repris par le PDL-145T']
+};
+/* Deux structures sur 212 sortent de l'assiette : afficher « non » sur les
+   210 autres n'apprendrait rien. On ne montre que l'exception. */
+const SILENCE_SI = {pdl145t: 0, rehab_pdl: 0, dans_assiette: 1};
+
+/* Un montant s'affiche en fourchette : le champ « — bas (USD) » porte la
+   ligne, le champ « — haut (USD) » qui le suit est absorbe. */
+const SUFFIXE_BAS = ' — bas (USD)', SUFFIXE_HAUT = ' — haut (USD)';
+
+function valeur(v){
+  return (typeof v === 'number' && Number.isInteger(v) && Math.abs(v) >= 10000)
+    ? NOMBRE.format(v) : v;
+}
+
 function infobulle(c, props){
   const t = c.champs.map(([ch, lib]) => {
     let v = props[ch];
     if (v === undefined || v === null || v === '') return '';
-    if (ch === 'declaration_partielle') v = v ? 'oui — comptage à compléter' : 'non';
+    if (ch in SILENCE_SI && v === SILENCE_SI[ch]) return '';
+    if (lib.endsWith(SUFFIXE_HAUT)) return '';
+    if (lib.endsWith(SUFFIXE_BAS)){
+      const paire = c.champs.find(([, l]) =>
+        l === lib.slice(0, -SUFFIXE_BAS.length) + SUFFIXE_HAUT);
+      const h = paire ? props[paire[0]] : null;
+      const texte = (h === undefined || h === null)
+        ? `${NOMBRE.format(v)} USD`
+        : `${NOMBRE.format(v)} – ${NOMBRE.format(h)} USD`;
+      return `<tr><td>${lib.slice(0, -SUFFIXE_BAS.length)}</td>`
+           + `<td><b>${texte}</b></td></tr>`;
+    }
+    if (OUI_NON[ch]) v = OUI_NON[ch][v ? 0 : 1];
+    else v = valeur(v);
     return `<tr><td>${lib}</td><td><b>${v}</b></td></tr>`;
   }).join('');
   const titre = props.nom || props.village || props.phase_nom || c.titre;

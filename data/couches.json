@@ -69,9 +69,29 @@
    [
     "phase",
     "Phase"
+   ],
+   [
+    "coef_echelon",
+    "Coefficient d'échelon"
+   ],
+   [
+    "cout_rehab_bas",
+    "Réhabilitation lourde — bas (USD)"
+   ],
+   [
+    "cout_rehab_haut",
+    "Réhabilitation lourde — haut (USD)"
+   ],
+   [
+    "pdl145t",
+    "Déjà repris par le PDL-145T"
+   ],
+   [
+    "dans_assiette",
+    "Dans l'assiette à financer"
    ]
   ],
-  "info": "Valeur de service d'une réhabilitation, et non état du bâtiment, qui n'est documenté nulle part. Taille = habitants par structure.",
+  "info": "Valeur de service d'une réhabilitation, et non état du bâtiment, qui n'est documenté nulle part. Taille = habitants par structure. Le coût affiché est un ordre de grandeur : coût du neuf documenté en RDC, ramené à 40–60 % pour une reprise lourde, multiplié par le coefficient de l'échelon.",
   "fichier": "data/rehab_sante.geojson",
   "n": 212,
   "visible": true
@@ -143,9 +163,21 @@
    [
     "phase",
     "Phase"
+   ],
+   [
+    "ecoles_a_reprendre",
+    "Écoles à reprendre (60 %)"
+   ],
+   [
+    "cout_rehab_bas",
+    "Réhabilitation lourde — bas (USD)"
+   ],
+   [
+    "cout_rehab_haut",
+    "Réhabilitation lourde — haut (USD)"
    ]
   ],
-  "info": "Classement par village, faute d'écoles géolocalisées. Contour noir : comptage d'OKAPI manifestement partiel, à lire comme une donnée manquante et non comme une priorité.",
+  "info": "Classement par village, faute d'écoles géolocalisées. Le coût est celui attendu pour le village : écoles déclarées × 60 % × 52 000 à 120 000 USD. Contour noir : comptage d'OKAPI manifestement partiel, à lire comme une donnée manquante et non comme une priorité.",
   "fichier": "data/rehab_ecoles.geojson",
   "n": 80,
   "visible": true
@@ -281,9 +313,21 @@
    [
     "rehab_rayon",
     "Rayon de desserte (m)"
+   ],
+   [
+    "rehab_cout_bas",
+    "Réhabilitation lourde — bas (USD)"
+   ],
+   [
+    "rehab_cout_haut",
+    "Réhabilitation lourde — haut (USD)"
+   ],
+   [
+    "rehab_pdl",
+    "Déjà repris par le PDL-145T"
    ]
   ],
-  "info": "270 formations sanitaires. Le contour noir signale un comptage au village, sans position individuelle.",
+  "info": "273 enregistrements pour 278 formations sanitaires. Le contour noir signale un comptage au village, sans position individuelle.",
   "fichier": "data/sante.geojson",
   "n": 273,
   "visible": true
@@ -324,7 +368,7 @@
     "Source"
    ]
   ],
-  "info": "88 enregistrements pour 104 écoles : 96 viennent du relevé d'OKAPI, comptées au village.",
+  "info": "89 enregistrements pour 105 écoles : 97 viennent du relevé d'OKAPI, comptées au village.",
   "fichier": "data/education.geojson",
   "n": 89,
   "visible": true
@@ -493,6 +537,14 @@
    [
     "ecole_partiel",
     "Comptage scolaire partiel"
+   ],
+   [
+    "ecole_cout_bas",
+    "Écoles — réhabilitation — bas (USD)"
+   ],
+   [
+    "ecole_cout_haut",
+    "Écoles — réhabilitation — haut (USD)"
    ]
   ],
   "info": "148 villages relevés au GPS, septembre 2026. La population est estimative et ne sert à aucun calcul.",
@@ -549,7 +601,7 @@
     "Longueur (km)"
    ]
   ],
-  "info": "565,5 km, dix tronçons.",
+  "info": "577,9 km, onze tronçons.",
   "fichier": "data/axe.geojson",
   "n": 11,
   "visible": true
@@ -566,7 +618,7 @@
    "epaisseur": 1
   },
   "champs": [],
-  "info": "Bande de 500 m de part et d'autre de l'axe, 564,6 km².",
+  "info": "Bande de 500 m de part et d'autre de l'axe, 575,5 km².",
   "fichier": "data/emprise.geojson",
   "n": 1,
   "visible": true
