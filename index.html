@@ -80,11 +80,18 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:var(
 .leaflet-popup-content table{border-collapse:collapse}
 .leaflet-popup-content td{padding:2px 8px 2px 0;vertical-align:top}
 .leaflet-popup-content td:first-child{color:#78909c;white-space:nowrap}
+/* logo CPCS, coin haut droit de la carte */
+.logo-cpcs{display:block;background:#fff;padding:7px 10px;border-radius:3px;
+  box-shadow:0 1px 5px rgba(0,0,0,.3);line-height:0}
+.logo-cpcs img{width:96px;height:auto;display:block}
+
 #bascule{display:none}
 @media (max-width:820px){
   :root{--panneau:100%}
   #app{flex-direction:column}
   #panneau{height:52%;border-right:0;border-bottom:1px solid var(--bord)}
+  .logo-cpcs{padding:5px 7px}
+  .logo-cpcs img{width:68px}
 }
 </style>
 </head>
@@ -137,6 +144,23 @@ html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:var(
 // situes en dessous, ce qui rendait les villages inaccessibles. En SVG chaque
 // objet est un element du DOM, dans son propre pane, et reste cliquable.
 const carte = L.map('carte', {zoomControl:false}).setView([3.1, 20.0], 7);
+
+/* Logo CPCS, en haut a droite. Ajoute AVANT le controle de zoom : dans un
+   meme coin, Leaflet empile les controles dans l'ordre d'ajout, le logo se
+   place donc au-dessus des boutons. */
+const LogoCPCS = L.Control.extend({
+  onAdd(){
+    const a = L.DomUtil.create('a', 'logo-cpcs');
+    a.href = 'https://cpcs.ca';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = 'CPCS — mandat 25077, corridor Bangui–Lisala';
+    a.innerHTML = '<img src="assets/cpcs.svg" alt="CPCS" width="1631" height="662">';
+    L.DomEvent.disableClickPropagation(a);   // sinon un clic zoome la carte
+    return a;
+  }
+});
+new LogoCPCS({position:'topright'}).addTo(carte);
 L.control.zoom({position:'topright'}).addTo(carte);
 L.control.scale({imperial:false, position:'bottomright'}).addTo(carte);
 
